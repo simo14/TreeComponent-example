@@ -1,0 +1,107 @@
+<Tree [nodes]="nodes"></Tree>
+<div style="width: 100%;">
+
+    <div style="padding: 4px;">
+        <div style="float: right;">
+            <input #searchinput type="text" id="searchInput" placeholder="Type text to query..."/>
+            <button #searchButton (click)="search(searchinput.value)" class="btn btn-default searchButton">Search</button>
+            <button (click)="mark(searchinput.value)" class="btn btn-default">Mark</button>
+            <button [disabled]="!showGrid" (click)="showGrid=false" class="btn btn-default destroyGrid">Destroy Grid</button>
+            <button [disabled]="showGrid" (click)="showGrid=true" class="btn btn-default createGrid">Create Grid</button>
+        </div>
+        <div style="float:right">
+            <label>
+                Order by relevance <input type="checkbox" (change)="searchByRelevance=$event.target.checked"/>
+            </label>
+        </div>
+        <div>
+            <b>Row count</b>
+            <p id="rowCount" [innerText]="rowCount"></p><!-- should be textContent-->
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+    <div>
+        <form class="form-inline" style="float:left">
+            <div class="form-group">
+                <label for="from">From</label>
+                <input #from type="datetime-local" class="form-control" id="from" placeholder="From" [value]="getDefaultFromValue()" novalidate="true" step=1>
+            </div>
+
+            <div class="form-group" style="margin-left:1em">
+                <label for="to">To</label>
+                <input #to type="datetime-local" class="form-control" id="to" placeholder="To" [value]="getDefaultToValue()" novalidate="true" step=1>
+            </div>
+            <button (click)="loadByDate(to.value, from.value)" class="btn btn-default searchByDate" style="margin-left:1em">Search</button>
+        </form>
+        <p id="errorMessage" style="color:red; float:left" [innerText]="errorMessage"></p>
+
+        <file-tree [directories]="directories" style="float:right"></file-tree>
+    </div>
+
+    <div [hidden]="!showGrid">
+
+        <!-- Because we are using the Angular ID (ie #ag-grid marker), we have to have all the items that use
+             that marker inside the same ng-if as the grid -->
+
+        <div style="padding: 4px;" class="toolbar">
+            <span>
+                Grid API:
+                <button (click)="agGrid.api.selectAll()" class="btn btn-default">Select All</button>
+                <button (click)="agGrid.api.deselectAll()" class="btn btn-default">Clear Selection</button>
+            </span>
+        </div>
+        <div style="clear: both;"></div>
+        <div style="padding: 4px;" class="toolbar">
+            <button (click)="createRowData()" class="btn btn-default">Refresh Data</button>
+        </div>
+        <div style="clear: both;"></div>
+
+        <ag-grid-ng2 #agGrid style="width: 80%; height: 30em; margin-left:3em" class="ag-fresh"
+
+                     [gridOptions]="gridOptions"
+                     [columnDefs]="columnDefs"
+                     [showToolPanel]="showToolPanel"
+                     [rowData]="rowData"
+
+                     enableColResize
+                     enableSorting
+                     enableFilter
+                     groupHeaders
+                     suppressRowClickSelection
+                     toolPanelSuppressGroups
+                     toolPanelSuppressValues
+                     debug
+                     rowHeight="22"
+                     rowSelection="multiple"
+
+                     (modelUpdated)="onModelUpdated()"
+                     (cellClicked)="onCellClicked($event)"
+                     (cellDoubleClicked)="onCellDoubleClicked($event)"
+                     (cellContextMenu)="onCellContextMenu($event)"
+                     (cellValueChanged)="onCellValueChanged($event)"
+                     (cellFocused)="onCellFocused($event)"
+                     (rowSelected)="onRowSelected($event)"
+                     (selectionChanged)="onSelectionChanged()"
+                     (beforeFilterChanged)="onBeforeFilterChanged()"
+                     (afterFilterChanged)="onAfterFilterChanged()"
+                     (filterModified)="onFilterModified()"
+                     (beforeSortChanged)="onBeforeSortChanged()"
+                     (afterSortChanged)="onAfterSortChanged()"
+                     (virtualRowRemoved)="onVirtualRowRemoved($event)"
+                     (rowClicked)="onRowClicked($event)"
+                     (ready)="onReady($event)"
+
+                     (columnEverythingChanged)="onColumnEvent($event)"
+                     (columnRowGroupChanged)="onColumnEvent($event)"
+                     (columnValueChanged)="onColumnEvent($event)"
+                     (columnMoved)="onColumnEvent($event)"
+                     (columnVisible)="onColumnEvent($event)"
+                     (columnGroupOpened)="onColumnEvent($event)"
+                     (columnResized)="onColumnEvent($event)"
+                     (columnPinnedCountChanged)="onColumnEvent($event)">
+        </ag-grid-ng2>
+        <div><button *ngIf="showLoadMore" (click)="loadMore()" class="btn btn-default" style="margin-left:40%">Load more</button></div>
+    </div>
+
+</div>
